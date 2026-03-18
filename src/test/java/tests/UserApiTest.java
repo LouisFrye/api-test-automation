@@ -1,18 +1,24 @@
 package tests;
 
 import base.BaseTest;
+import data.TestData;
+import io.qameta.allure.junit5.AllureJunit5;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import data.TestData;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
+@ExtendWith(AllureJunit5.class)
+@Tag("api")
 public class UserApiTest extends BaseTest {
 
     @Test
+    @Tag("smoke")
     void getUsersShouldReturn200() {
         given()
                 .when()
@@ -23,19 +29,21 @@ public class UserApiTest extends BaseTest {
     }
 
     @Test
+    @Tag("regression")
     void getUser1ShouldReturnCorrectUser() {
         given()
                 .when()
-                .get("/users/1")
+                .get("/users/" + TestData.VALID_USER_ID)
                 .then()
                 .statusCode(200)
-                .body("id", equalTo(1))
+                .body("id", equalTo(TestData.VALID_USER_ID))
                 .body("name", not(emptyString()))
                 .body("email", containsString("@"));
     }
 
     @ParameterizedTest
     @ValueSource(ints = {1, 2, 3, 4, 5})
+    @Tag("regression")
     void getUserShouldReturn200ForValidIds(int userId) {
         given()
                 .when()
@@ -51,6 +59,7 @@ public class UserApiTest extends BaseTest {
             "2, 200",
             "9999, 404"
     })
+    @Tag("regression")
     void getUserShouldReturnExpectedStatus(int userId, int expectedStatus) {
         given()
                 .when()

@@ -1,58 +1,35 @@
 package tests;
 
+import baseui.BaseUiTest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.LoginPage;
 
-import java.time.Duration;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-public class LoginTest {
+public class LoginTest extends BaseUiTest {
 
     @Test
-    void validLoginShouldShowSuccessMessage() {
+    public void validLoginShouldShowSuccessMessage() {
+        LoginPage loginPage = new LoginPage(getDriver());
 
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        loginPage.open();
+        loginPage.enterUsername("tomsmith");
+        loginPage.enterPassword("SuperSecretPassword!");
+        loginPage.clickLogin();
 
-        try {
-            driver.get("https://the-internet.herokuapp.com/login");
-
-            driver.findElement(By.id("username")).sendKeys("tomsmith");
-            driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
-            driver.findElement(By.cssSelector("button[type='submit']")).click();
-
-            WebElement flash = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("flash")));
-            assertTrue(flash.getText().toLowerCase().contains("you logged into a secure area"));
-
-        } finally {
-            driver.quit();
-        }
+        String message = loginPage.getFlashMessageText();
+        Assertions.assertTrue(message.contains("You logged into a secure area!"));
     }
 
     @Test
-    void invalidPasswordShouldShowErrorMessage() {
+    public void invalidPasswordShouldShowErrorMessage() {
+        LoginPage loginPage = new LoginPage(getDriver());
 
-        WebDriver driver = new ChromeDriver();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        loginPage.open();
+        loginPage.enterUsername("tomsmith");
+        loginPage.enterPassword("wrongpassword");
+        loginPage.clickLogin();
 
-        try {
-            driver.get("https://the-internet.herokuapp.com/login");
-
-            driver.findElement(By.id("username")).sendKeys("tomsmith");
-            driver.findElement(By.id("password")).sendKeys("wrongPassword");
-            driver.findElement(By.cssSelector("button[type='submit']")).click();
-
-            WebElement flash = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("flash")));
-            assertTrue(flash.getText().toLowerCase().contains("your password is invalid"));
-
-        } finally {
-            driver.quit();
-        }
+        String message = loginPage.getFlashMessageText();
+        Assertions.assertTrue(message.contains("Your password is invalid!"));
     }
 }
