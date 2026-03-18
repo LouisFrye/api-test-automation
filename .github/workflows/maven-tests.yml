@@ -19,7 +19,7 @@ jobs:
           java-version: '21'
 
   - name: Run Tests
-    run: mvn clean test -Dtest="*ApiTest,*UserTest"
+    run: mvn clean test -Dtest=tests.UserApiTest,tests.JsonPlaceholderApiTest,UserTest
 
       - name: Upload Allure Results
         uses: actions/upload-artifact@v4
